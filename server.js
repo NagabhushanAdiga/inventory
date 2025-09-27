@@ -7,6 +7,7 @@ const connectDB = require("./config/db")
 // Routes
 const authRoutes = require("./routes/auth")
 const itemsRoutes = require("./routes/items")
+const groupRoutes = require('./routes/group')
 
 const PORT = process.env.PORT || 5000
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/inventory"
@@ -30,6 +31,7 @@ connectDB(MONGO_URI).catch(err => {
 // ✅ Standard API prefixes
 app.use("/api/auth", authRoutes)
 app.use("/api/items", itemsRoutes)
+app.use("/api/groups",groupRoutes)
 
 app.get("/", (req, res) => res.send("✅ Inventory API is running"))
 
