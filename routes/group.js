@@ -4,6 +4,15 @@ const Group = require("../models/Group");
 
 const router = express.Router();
 
+const generateRandomColour = () =>{
+   const hexChars = '0123456789ABCDEF';
+  let hexColor = '#';
+  for (let i = 0; i < 6; i++) {
+    hexColor += hexChars[Math.floor(Math.random() * hexChars.length)];
+  }
+  return hexColor;
+} 
+
 // Create group
 router.post("/", async (req, res) => {
   try {
@@ -13,7 +22,7 @@ router.post("/", async (req, res) => {
     const exists = await Group.findOne({ name });
     if (exists) return res.status(400).json({ error: "Group already exists" });
 
-    const group = await Group.create({ name, description });
+    const group = await Group.create({ name, description ,colour:generateRandomColour() });
     res.status(201).json(group);
   } catch (err) {
     res.status(400).json({ error: err.message });
