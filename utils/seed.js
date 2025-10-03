@@ -2,7 +2,6 @@ require("dotenv").config();
 const connectDB = require("../config/db");
 const User = require("../models/User");
 const Item = require("../models/Item");
-const Group = require("../models/Group"); // ✅ Import Group model
 const bcrypt = require("bcryptjs");
 
 async function seed(action) {
@@ -11,21 +10,17 @@ async function seed(action) {
   if (action === "delete") {
     await User.deleteMany({});
     await Item.deleteMany({});
-    await Group.deleteMany({});
-    console.log("🔥 All users, items, and groups deleted");
+    console.log("🔥 All users and items deleted");
     process.exit(0);
   }
 
   if (action === "insert") {
     await User.deleteMany({});
     await Item.deleteMany({});
-    await Group.deleteMany({});
 
-    // 🔑 Passwords
-    const adminPass = await bcrypt.hash("admin123", 10);
+    const adminPass = await bcrypt.hash("1234", 10);
     const userPass = await bcrypt.hash("user123", 10);
 
-    // 👤 Users
     const admin = await User.create({
       username: "admin",
       password: adminPass,
@@ -37,48 +32,35 @@ async function seed(action) {
       role: "user",
     });
 
-    // 📦 Groups
-    const electronics = await Group.create({
-      name: "Electronics",
-      description: "Electronic gadgets and accessories",
-    });
-    const office = await Group.create({
-      name: "Office Supplies",
-      description: "Everyday office essentials",
-    });
-
-    // 📦 Items with groups
     await Item.create([
       {
         name: "AA Batteries",
         sku: "BAT-AA",
         quantity: 200,
+           colour:"#dc3545",
         price: 0.5,
         createdBy: admin._id,
-        group: office._id, // 🔗 assigned to Office
       },
       {
         name: "USB-C Cable",
         sku: "USB-C-1M",
         quantity: 50,
+           colour:"#dc3545",
         price: 3.99,
         createdBy: user._id,
-        group: electronics._id, // 🔗 assigned to Electronics
       },
       {
         name: "Laptop Stand",
         sku: "STAND-01",
         quantity: 12,
+        colour:"#dc3545",
         price: 29.99,
         createdBy: admin._id,
-        group: office._id, // 🔗 assigned to Office
       },
     ]);
 
     console.log(
-      "✅ Seed done.\n" +
-        "👤 Credentials:\n - Admin: admin/admin123\n - User: user/user123\n" +
-        "📦 Groups created: Electronics, Office Supplies"
+      "✅ Seed done. Credentials:\n - Admin: admin/admin123\n - User: user/user123"
     );
     process.exit(0);
   }
