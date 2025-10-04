@@ -4,14 +4,14 @@ const Group = require("../models/Group");
 
 const router = express.Router();
 
-const generateRandomColour = () =>{
-   const hexChars = '0123456789ABCDEF';
-  let hexColor = '#';
+const generateRandomColour = () => {
+  const hexChars = "0123456789ABCDEF";
+  let hexColor = "#";
   for (let i = 0; i < 6; i++) {
     hexColor += hexChars[Math.floor(Math.random() * hexChars.length)];
   }
   return hexColor;
-} 
+};
 
 // Create group
 router.post("/", async (req, res) => {
@@ -22,18 +22,42 @@ router.post("/", async (req, res) => {
     const exists = await Group.findOne({ name });
     if (exists) return res.status(400).json({ error: "Group already exists" });
 
-    const group = await Group.create({ name, description ,colour:generateRandomColour() });
+    const group = await Group.create({
+      name,
+      description,
+      colour: generateRandomColour(),
+    });
     res.status(201).json(group);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
 
-// Get all groups
+// Get all groups with search + pagination
+// GET /groups?search=&page=1&limit=20
 router.get("/", async (req, res) => {
   try {
-    const groups = await Group.find().sort({ createdAt: -1 });
-    res.json(groups);
+    const { search = "", page = 1, limit = 20 } = req.query;
+
+    const q = search
+      ? { name: { $regex: search, $options: "i" } }
+      : {};
+
+    const skip = (Math.max(1, parseInt(page)) - 1) * parseInt(limit);
+
+    const total = await Group.countDocuments(q);
+
+    const groups = await Group.find(q)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 });
+
+    res.json({
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      groups, // <--- returning as "groups"
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
