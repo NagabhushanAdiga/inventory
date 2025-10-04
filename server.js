@@ -20,7 +20,7 @@ connectDB(MONGO_URI).catch(err => { console.error(err) ;process.exit(1) })
 
 app.use("/auth", authRoutes)
 app.use("/items", itemsRoutes)
-app.use("./groups",groupRoutes)
+app.use("/groups",groupRoutes)
 
 app.get("/", (req, res) => res.send("Inventory API running"))
 
