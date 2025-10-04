@@ -20,7 +20,7 @@ const itemSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
   // 👇 Embedded group snapshot
-  group: { type: groupSnapshotSchema, required: true }
+  group: { type: groupSnapshotSchema }
 
 }, { timestamps: true })
 
